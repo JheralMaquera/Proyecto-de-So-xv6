@@ -7,6 +7,9 @@
 #include "mmu.h"
 #include "proc.h"
 
+
+extern int trace_on;
+
 int
 sys_fork(void)
 {
@@ -88,4 +91,18 @@ sys_uptime(void)
   xticks = ticks;
   release(&tickslock);
   return xticks;
+}
+
+
+int
+sys_trace(void)
+{
+  int state;
+
+  // argint(0, &state) recupera el primer argumento (índice 0) que envió el usuario
+  if(argint(0, &state) < 0)
+    return -1;
+
+  trace_on = state; // Asignamos el valor (0 o 1)
+  return 0;
 }
