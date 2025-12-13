@@ -136,29 +136,66 @@ static int (*syscalls[])(void) = {
 };
 
 static char *syscallnames[] = {
-[SYS_fork]    "fork",
-[SYS_exit]    "exit",
-[SYS_wait]    "wait",
-[SYS_pipe]    "pipe",
-[SYS_read]    "read",
-[SYS_kill]    "kill",
-[SYS_exec]    "exec",
-[SYS_fstat]   "fstat",
-[SYS_chdir]   "chdir",
-[SYS_dup]     "dup",
-[SYS_getpid]  "getpid",
-[SYS_sbrk]    "sbrk",
-[SYS_sleep]   "sleep",
-[SYS_uptime]  "uptime",
-[SYS_open]    "open",
-[SYS_write]   "write",
-[SYS_mknod]   "mknod",
-[SYS_unlink]  "unlink",
-[SYS_link]    "link",
-[SYS_mkdir]   "mkdir",
-[SYS_close]   "close",
-[SYS_trace]   "trace",
+[SYS_fork]    "fork (Clonar Proceso)",
+[SYS_exit]    "exit (Terminar)",
+[SYS_wait]    "wait (Esperar hijo)",
+[SYS_pipe]    "pipe (Tuberia)",
+[SYS_read]    "read (Leer)",
+[SYS_kill]    "kill (Matar)",
+[SYS_exec]    "exec (Ejecutar)",
+[SYS_fstat]   "fstat (Info Archivo)",
+[SYS_chdir]   "chdir (Cambiar Dir)",
+[SYS_dup]     "dup (Duplicar)",
+[SYS_getpid]  "getpid (Mi ID)",
+[SYS_sbrk]    "sbrk (Pedir Memoria)",
+[SYS_sleep]   "sleep (Dormir)",
+[SYS_uptime]  "uptime (Tiempo)",
+[SYS_open]    "open (Abrir)",
+[SYS_write]   "write (Escribir)",
+[SYS_mknod]   "mknod (Crear Nodo)",
+[SYS_unlink]  "unlink (Borrar)",
+[SYS_link]    "link (Enlazar)",
+[SYS_mkdir]   "mkdir (Crear Carpeta)",
+[SYS_close]   "close (Cerrar)",
+[SYS_trace]   "trace (Rastrear)",
 };
+
+static int syscall_argc[] = {
+[SYS_fork]    0,
+[SYS_exit]    1,
+[SYS_wait]    0,
+[SYS_pipe]    1,
+[SYS_read]    3,
+[SYS_kill]    1,
+[SYS_exec]    2,
+[SYS_fstat]   2,
+[SYS_chdir]   1,
+[SYS_dup]     1,
+[SYS_getpid]  0,
+[SYS_sbrk]    1,
+[SYS_sleep]   1,
+[SYS_uptime]  0,
+[SYS_open]    2,
+[SYS_write]   3,
+[SYS_mknod]   3,
+[SYS_unlink]  1,
+[SYS_link]    2,
+[SYS_mkdir]   1,
+[SYS_close]   1,
+[SYS_trace]   1,
+};
+
+
+static int
+get_syscall_arg(struct proc *p, int n)
+{
+  int val;
+  // En xv6 (x86), los argumentos están en esp + 4 + 4*n
+  // esp es el stack pointer. +4 salta la dirección de retorno.
+  if(fetchint(p->tf->esp + 4 + 4*n, &val) < 0)
+    return -1;
+  return val;
+}
 
 void
 syscall(void)
@@ -173,7 +210,19 @@ syscall(void)
 
     
     if (trace_on == 1) {
-        cprintf("%s -> %d\n", syscallnames[num], curproc->tf->eax);
+        cprintf("%s(", syscallnames[num]); // Imprime "nombre("
+        
+        int count = syscall_argc[num];
+        int i;
+        for(i = 0; i < count; i++){
+            int arg = get_syscall_arg(curproc, i);
+            cprintf("%d", arg); 
+            
+            if(i < count - 1){
+                cprintf(", "); // Agrega coma si no es el último
+            }
+        }
+        cprintf(") -> %d\n", curproc->tf->eax); // Cierra paréntesis e imprime el valor de retorno
     }
 
   } else {
