@@ -7,7 +7,7 @@
 #include "mmu.h"
 #include "proc.h"
 
-//Variable global que defini en syscall.c
+// `trace_on` vive en `syscall.c` y controla la instrumentación (Entregable 1).
 extern int trace_on;
 extern void psmem(void);
 
@@ -94,7 +94,11 @@ sys_uptime(void)
   return xticks;
 }
 
-//Syscall para activar/desactivar el trace
+// Syscall: trace(state)
+// Entregable 1: permite activar/desactivar el trazado de syscalls sin saturar
+// la consola permanentemente.
+// - state = 1: habilita
+// - state = 0: deshabilita
 int
 sys_trace(void)
 {
@@ -108,7 +112,9 @@ sys_trace(void)
   return 0;
 }
 
-// Wrapper para llamar a psmem en proc.c
+// Syscall: psmem()
+// Wrapper mínimo para invocar la rutina del kernel que imprime información
+// de memoria/procesos (Entregable 2).
 int
 sys_psmem(void)
 {

@@ -17,10 +17,10 @@ main(int argc, char *argv[])
    a:	55                   	push   %ebp
    b:	89 e5                	mov    %esp,%ebp
    d:	57                   	push   %edi
-  // 1. Llamamos al sistema para pedir los ticks (reloj interno)
+  // Obtener ticks del sistema
   int ticks = uptime();
   
-  // 2. Cálculos matemáticos (1 segundo = 100 ticks aprox)
+  // E2: Conversion basica (1 seg = 100 ticks aprox)
   int total_segundos = ticks / 100;
   int minutos = total_segundos / 60;
    e:	bf 89 88 88 88       	mov    $0x88888889,%edi
@@ -33,9 +33,9 @@ main(int argc, char *argv[])
   19:	e8 8d 03 00 00       	call   3ab <uptime>
   int horas = minutos / 60;
   
-  minutos = minutos % 60; // Ajuste para que no pase de 59
+  minutos = minutos % 60; // Ajuste de minutos
 
-  // 3. Imprimimos bonito
+  // Reporte formateado
   printf(1, "--------------------------------------\n");
   1e:	83 ec 08             	sub    $0x8,%esp
   int ticks = uptime();
@@ -68,7 +68,7 @@ main(int argc, char *argv[])
   printf(1, "Estado del Sistema (Uptime)\n");
   56:	58                   	pop    %eax
   57:	5a                   	pop    %edx
-  58:	68 f4 07 00 00       	push   $0x7f4
+  58:	68 f5 07 00 00       	push   $0x7f5
   5d:	6a 01                	push   $0x1
   5f:	e8 0c 04 00 00       	call   470 <printf>
   printf(1, "--------------------------------------\n");
@@ -82,19 +82,19 @@ main(int argc, char *argv[])
   72:	8b 4d e4             	mov    -0x1c(%ebp),%ecx
   75:	83 c4 0c             	add    $0xc,%esp
   78:	51                   	push   %ecx
-  79:	68 11 08 00 00       	push   $0x811
+  79:	68 12 08 00 00       	push   $0x812
   7e:	6a 01                	push   $0x1
   80:	e8 eb 03 00 00       	call   470 <printf>
   int segundos = total_segundos % 60;
   85:	6b c3 3c             	imul   $0x3c,%ebx,%eax
   88:	29 c6                	sub    %eax,%esi
-  minutos = minutos % 60; // Ajuste para que no pase de 59
+  minutos = minutos % 60; // Ajuste de minutos
   8a:	89 d8                	mov    %ebx,%eax
   8c:	f7 ef                	imul   %edi
   8e:	89 d8                	mov    %ebx,%eax
   printf(1, "Tiempo Activo : %d h, %d min, %d seg\n", horas, minutos, segundos);
   90:	89 34 24             	mov    %esi,(%esp)
-  minutos = minutos % 60; // Ajuste para que no pase de 59
+  minutos = minutos % 60; // Ajuste de minutos
   93:	c1 f8 1f             	sar    $0x1f,%eax
   96:	01 da                	add    %ebx,%edx
   98:	c1 fa 05             	sar    $0x5,%edx
@@ -108,8 +108,7 @@ main(int argc, char *argv[])
   a9:	6a 01                	push   $0x1
   ab:	e8 c0 03 00 00       	call   470 <printf>
   
-  // Sugerencia para usar tu otro comando
-  printf(1, "Nota: Ejecuta 'psmem' para ver uso de RAM.\n");
+  printf(1, "Nota: Usa 'psmem' para ver info de memoria.\n");
   b0:	83 c4 18             	add    $0x18,%esp
   b3:	68 c8 07 00 00       	push   $0x7c8
   b8:	6a 01                	push   $0x1
@@ -962,7 +961,7 @@ printf(int fd, const char *fmt, ...)
  5eb:	e9 31 ff ff ff       	jmp    521 <printf+0xb1>
  5f0:	b8 28 00 00 00       	mov    $0x28,%eax
           s = "(null)";
- 5f5:	bb 2b 08 00 00       	mov    $0x82b,%ebx
+ 5f5:	bb 2c 08 00 00       	mov    $0x82c,%ebx
  5fa:	e9 77 ff ff ff       	jmp    576 <printf+0x106>
  5ff:	90                   	nop
 

@@ -15,13 +15,19 @@
 // to a saved program counter, and then the first argument.
 
 // Fetch the int at addr from the current process.
-//  Variable global para saber si el trace esta prendido
+// ----------------- ENTREGABLE 1: Instrumentación (trace) -----------------
+// `trace_on` habilita/deshabilita el trazado de syscalls.
+// Cuando está activo, el kernel imprime en consola:
+//   nombre_syscall(arg1, arg2, ...) -> retorno
 int trace_on = 0;
 
 extern int sys_trace(void);
 extern int sys_psmem(void);
 
-//Contador de invocaciones (inicializado en 0)
+// ---------------- ENTREGABLE 3: Contador de invocaciones -----------------
+// Contador simple por número de syscall. Se incrementa en `syscall()` justo
+// antes de ejecutar la syscall real.
+// Nota: tamaño 30 para cubrir IDs actuales y dejar margen.
 static int syscall_counts[30] = {0};
 
 int
@@ -115,7 +121,9 @@ extern int sys_write(void);
 extern int sys_uptime(void);
 
 
-//Devuelve la cuenta de una syscall especifica
+// Syscall nueva: get_count(id)
+// Devuelve cuántas veces se invocó la syscall `id` desde el arranque.
+// - Retorna -1 si el id es inválido.
 int
 sys_get_count(void)
 {
@@ -158,7 +166,7 @@ static int (*syscalls[])(void) = {
 [SYS_get_count]   sys_get_count,
 };
 
-// Mapeo de ID a Nombre para imprimir bonito
+// Tabla de nombres (solo para impresión en `trace`).
 static char *syscallnames[] = {
 [SYS_fork]    "fork (Clonar Proceso)",
 [SYS_exit]    "exit (Terminar)",
@@ -186,7 +194,8 @@ static char *syscallnames[] = {
 [SYS_get_count]   "get_count",//contar sycall
 };
 
-//Cuantos argumentos tiene cada funcion (para el loop de impresion)
+// Tabla de cantidad de argumentos por syscall.
+// Se usa únicamente para imprimir en `trace` sin “adivinar” cuántos args leer.
 static int syscall_argc[] = {
 [SYS_fork]    0,
 [SYS_exit]    1,
@@ -214,13 +223,12 @@ static int syscall_argc[] = {
 [SYS_get_count]   1,//Número de argumentos
 };
 
-//Funcion auxiliar para leer argumentos del stack del proceso
+// Helper de tracing: lee argumentos de la pila del proceso usuario.
+// En xv6 x86, los args están en `esp + 4 + 4*n` (después de la dirección de retorno).
 static int
 get_syscall_arg(struct proc *p, int n)
 {
   int val;
-  // En xv6 (x86), los argumentos están en esp + 4 + 4*n
-  // esp es el stack pointer. +4 salta la dirección de retorno.
   if(fetchint(p->tf->esp + 4 + 4*n, &val) < 0)
     return -1;
   return val;
@@ -235,13 +243,13 @@ syscall(void)
   num = curproc->tf->eax;
 
   if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
-    // Incrementar el contador de invocaciones
+    // ENTREGABLE 3: incrementar contador por syscall
     syscall_counts[num]++;
 
     // Ejecutar la syscall
     curproc->tf->eax = syscalls[num]();
 
-    // Si el tracing está activado, imprimir la información
+    // ENTREGABLE 1: si tracing activo, imprimir nombre, args y retorno
     if (trace_on == 1) {
         
         cprintf("%s(", syscallnames[num]); // Imprime "nombre("

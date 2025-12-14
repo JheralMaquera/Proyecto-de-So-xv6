@@ -22,7 +22,7 @@ main(int argc, char *argv[])
   10:	51                   	push   %ecx
   11:	83 ec 18             	sub    $0x18,%esp
   int i;
-
+  // Si se pasa un argumento, mostramos el conteo de esa syscall
   if(argc == 2){
   14:	83 39 02             	cmpl   $0x2,(%ecx)
 {
@@ -33,7 +33,7 @@ main(int argc, char *argv[])
              id, nombres_syscalls[id], conteo);
     }
   } else {
-
+    //Tabla general
     printf(1, "ID   Nombre        Invocaciones\n");
   20:	52                   	push   %edx
     printf(1, "--------------------------------\n");

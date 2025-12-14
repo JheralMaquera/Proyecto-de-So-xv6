@@ -8334,16 +8334,16 @@ psmem(void)
 80104284:	53                   	push   %ebx
 80104285:	bb c0 2d 11 80       	mov    $0x80112dc0,%ebx
   [RUNNABLE]  "RUNNABLE",
-  [RUNNING]   "RUNNING ", // <-- Ojo al espacio extra aquí
+  [RUNNING]   "RUNNING ", 
   [ZOMBIE]    "ZOMBIE  "
   };
 
-  acquire(&ptable.lock);
+  acquire(&ptable.lock); // Candado para leer seguro
 8010428a:	83 ec 0c             	sub    $0xc,%esp
 8010428d:	68 20 2d 11 80       	push   $0x80112d20
 80104292:	e8 b9 03 00 00       	call   80104650 <acquire>
 
-  // Usamos menos tabs y más espacios visuales
+ 
   cprintf("\nPID    Estado      Memoria     Nombre\n");
 80104297:	c7 04 24 5c 7b 10 80 	movl   $0x80107b5c,(%esp)
 8010429e:	e8 0d c4 ff ff       	call   801006b0 <cprintf>
@@ -8358,8 +8358,7 @@ psmem(void)
     if(p->state == UNUSED)
       continue;
 
-    // Quitamos un \t después de %s porque ya rellenamos con espacios arriba
-    // %s ahora siempre mide 8, mas un espacio manual, queda perfecto.
+    // Si el estado es valido, imprimimos con formato alineado
     if(p->state >= 0 && p->state < NELEM(states) && states[p->state])
 801042b8:	8b 34 85 c0 7e 10 80 	mov    -0x7fef8140(,%eax,4),%esi
 801042bf:	85 f6                	test   %esi,%esi
@@ -9383,9 +9382,9 @@ swtch:
 8010496f:	c3                   	ret
 
 80104970 <sys_get_count>:
-extern int sys_write(void);
-extern int sys_uptime(void);
-
+// Syscall nueva: get_count(id)
+// Devuelve cuántas veces se invocó la syscall `id` desde el arranque.
+// - Retorna -1 si el id es inválido.
 int
 sys_get_count(void)
 {
@@ -9411,11 +9410,11 @@ sys_get_count(void)
 80104993:	72 1b                	jb     801049b0 <sys_get_count+0x40>
   *ip = *(int*)(addr);
 80104995:	8b 43 04             	mov    0x4(%ebx),%eax
-  // Leemos el argumento (qué ID de syscall quiere saber el usuario)
+  // Obtener argumento
   if(argint(0, &id) < 0)
     return -1;
   
-  // Si el ID es válido, devolvemos la cuenta
+  // Validar rango y devolver contador
   if(id > 0 && id < 30) {
 80104998:	8d 50 ff             	lea    -0x1(%eax),%edx
 8010499b:	83 fa 1c             	cmp    $0x1c,%edx
@@ -9717,15 +9716,17 @@ syscall(void)
 80104bb2:	8b 04 b5 00 80 10 80 	mov    -0x7fef8000(,%esi,4),%eax
 80104bb9:	85 c0                	test   %eax,%eax
 80104bbb:	0f 84 c7 00 00 00    	je     80104c88 <syscall+0xf8>
-
+    // ENTREGABLE 3: incrementar contador por syscall
     syscall_counts[num]++;
 80104bc1:	83 04 b5 80 4c 11 80 	addl   $0x1,-0x7feeb380(,%esi,4)
 80104bc8:	01 
+
+    // Ejecutar la syscall
     curproc->tf->eax = syscalls[num]();
 80104bc9:	ff d0                	call   *%eax
 80104bcb:	8b 53 18             	mov    0x18(%ebx),%edx
 
-    
+    // ENTREGABLE 1: si tracing activo, imprimir nombre, args y retorno
     if (trace_on == 1) {
 80104bce:	83 3d 60 4c 11 80 01 	cmpl   $0x1,0x80114c60
     curproc->tf->eax = syscalls[num]();
@@ -9742,6 +9743,7 @@ syscall(void)
         int count = syscall_argc[num];
 80104bf2:	8b 0c b5 00 7f 10 80 	mov    -0x7fef8100(,%esi,4),%ecx
         int i;
+        // Recorro y saco los argumentos uno por uno
         for(i = 0; i < count; i++){
 80104bf9:	83 c4 10             	add    $0x10,%esp
 80104bfc:	31 f6                	xor    %esi,%esi
@@ -11562,8 +11564,9 @@ sys_uptime(void)
 801059fa:	8d b6 00 00 00 00    	lea    0x0(%esi),%esi
 
 80105a00 <sys_trace>:
-
-
+// la consola permanentemente.
+// - state = 1: habilita
+// - state = 0: deshabilita
 int
 sys_trace(void)
 {
@@ -11572,7 +11575,7 @@ sys_trace(void)
 80105a03:	83 ec 20             	sub    $0x20,%esp
   int state;
 
-  // argint(0, &state) recupera el primer argumento (índice 0) que envió el usuario
+  
   if(argint(0, &state) < 0)
 80105a06:	8d 45 f4             	lea    -0xc(%ebp),%eax
 80105a09:	50                   	push   %eax
@@ -11583,7 +11586,7 @@ sys_trace(void)
 80105a16:	78 0c                	js     80105a24 <sys_trace+0x24>
     return -1;
 
-  trace_on = state; // Asignamos el valor (0 o 1)
+  trace_on = state; 
 80105a18:	8b 45 f4             	mov    -0xc(%ebp),%eax
 80105a1b:	a3 60 4c 11 80       	mov    %eax,0x80114c60
   return 0;
@@ -11599,7 +11602,9 @@ sys_trace(void)
 80105a2b:	2e 8d 74 26 00       	lea    %cs:0x0(%esi,%eiz,1),%esi
 
 80105a30 <sys_psmem>:
-
+// Syscall: psmem()
+// Wrapper mínimo para invocar la rutina del kernel que imprime información
+// de memoria/procesos (Entregable 2).
 int
 sys_psmem(void)
 {

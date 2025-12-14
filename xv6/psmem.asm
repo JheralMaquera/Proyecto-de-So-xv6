@@ -14,7 +14,7 @@ main(int argc, char *argv[])
    0:	55                   	push   %ebp
    1:	89 e5                	mov    %esp,%ebp
    3:	83 e4 f0             	and    $0xfffffff0,%esp
-  // Simplemente llamamos a nuestra syscall que imprime la tabla
+  // Llamamos a la syscall que imprime la tabla
   psmem();
    6:	e8 f0 02 00 00       	call   2fb <psmem>
   exit();
