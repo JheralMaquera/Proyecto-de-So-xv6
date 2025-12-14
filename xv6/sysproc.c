@@ -9,6 +9,7 @@
 
 
 extern int trace_on;
+extern void psmem(void);
 
 int
 sys_fork(void)
@@ -104,5 +105,12 @@ sys_trace(void)
     return -1;
 
   trace_on = state; // Asignamos el valor (0 o 1)
+  return 0;
+}
+
+int
+sys_psmem(void)
+{
+  psmem();
   return 0;
 }

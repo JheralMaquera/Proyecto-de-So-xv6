@@ -19,6 +19,7 @@
 int trace_on = 0;
 
 extern int sys_trace(void);
+extern int sys_psmem(void);
 
 int
 fetchint(uint addr, int *ip)
@@ -133,6 +134,7 @@ static int (*syscalls[])(void) = {
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
 [SYS_trace]   sys_trace,
+[SYS_psmem]   sys_psmem,
 };
 
 static char *syscallnames[] = {
@@ -158,6 +160,7 @@ static char *syscallnames[] = {
 [SYS_mkdir]   "mkdir (Crear Carpeta)",
 [SYS_close]   "close (Cerrar)",
 [SYS_trace]   "trace (Rastrear)",
+[SYS_psmem]   "psmem (Info Memoria)",
 };
 
 static int syscall_argc[] = {
@@ -183,6 +186,7 @@ static int syscall_argc[] = {
 [SYS_mkdir]   1,
 [SYS_close]   1,
 [SYS_trace]   1,
+[SYS_psmem]   0,
 };
 
 

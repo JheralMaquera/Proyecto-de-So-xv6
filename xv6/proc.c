@@ -532,3 +532,39 @@ procdump(void)
     cprintf("\n");
   }
 }
+
+
+void
+psmem(void)
+{
+  struct proc *p;
+  // TRUCO: Agregamos espacios al final para que todas midan 8 letras exactas
+  static char *states[] = {
+  [UNUSED]    "UNUSED  ", 
+  [EMBRYO]    "EMBRYO  ",
+  [SLEEPING]  "SLEEPING",
+  [RUNNABLE]  "RUNNABLE",
+  [RUNNING]   "RUNNING ", // <-- Ojo al espacio extra aquí
+  [ZOMBIE]    "ZOMBIE  "
+  };
+
+  acquire(&ptable.lock);
+
+  // Usamos menos tabs y más espacios visuales
+  cprintf("\nPID    Estado      Memoria     Nombre\n");
+  cprintf("--------------------------------------\n");
+  
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    if(p->state == UNUSED)
+      continue;
+
+    // Quitamos un \t después de %s porque ya rellenamos con espacios arriba
+    // %s ahora siempre mide 8, mas un espacio manual, queda perfecto.
+    if(p->state >= 0 && p->state < NELEM(states) && states[p->state])
+      cprintf("%d      %s    %d       %s\n", p->pid, states[p->state], p->sz, p->name);
+    else
+      cprintf("%d      %d          %d       %s\n", p->pid, p->state, p->sz, p->name);
+  }
+  
+  release(&ptable.lock);
+}
