@@ -15,11 +15,13 @@
 // to a saved program counter, and then the first argument.
 
 // Fetch the int at addr from the current process.
-
+//  Variable global para saber si el trace esta prendido
 int trace_on = 0;
 
 extern int sys_trace(void);
 extern int sys_psmem(void);
+
+//Contador de invocaciones (inicializado en 0)
 static int syscall_counts[30] = {0};
 
 int
@@ -112,15 +114,17 @@ extern int sys_wait(void);
 extern int sys_write(void);
 extern int sys_uptime(void);
 
+
+//Devuelve la cuenta de una syscall especifica
 int
 sys_get_count(void)
 {
   int id;
-  // Leemos el argumento (qué ID de syscall quiere saber el usuario)
+  // Obtener argumento
   if(argint(0, &id) < 0)
     return -1;
   
-  // Si el ID es válido, devolvemos la cuenta
+  // Validar rango y devolver contador
   if(id > 0 && id < 30) {
     return syscall_counts[id];
   }
@@ -154,6 +158,7 @@ static int (*syscalls[])(void) = {
 [SYS_get_count]   sys_get_count,
 };
 
+// Mapeo de ID a Nombre para imprimir bonito
 static char *syscallnames[] = {
 [SYS_fork]    "fork (Clonar Proceso)",
 [SYS_exit]    "exit (Terminar)",
@@ -176,11 +181,12 @@ static char *syscallnames[] = {
 [SYS_link]    "link (Enlazar)",
 [SYS_mkdir]   "mkdir (Crear Carpeta)",
 [SYS_close]   "close (Cerrar)",
-[SYS_trace]   "trace (Rastrear)",
-[SYS_psmem]   "psmem (Info Memoria)",
-[SYS_get_count]   "get_count",
+[SYS_trace]   "trace (Rastrear)",//Trace
+[SYS_psmem]   "psmem (Info Memoria)",//psmem
+[SYS_get_count]   "get_count",//contar sycall
 };
 
+//Cuantos argumentos tiene cada funcion (para el loop de impresion)
 static int syscall_argc[] = {
 [SYS_fork]    0,
 [SYS_exit]    1,
@@ -205,10 +211,10 @@ static int syscall_argc[] = {
 [SYS_close]   1,
 [SYS_trace]   1,
 [SYS_psmem]   0,
-[SYS_get_count]   1,
+[SYS_get_count]   1,//Número de argumentos
 };
 
-
+//Funcion auxiliar para leer argumentos del stack del proceso
 static int
 get_syscall_arg(struct proc *p, int n)
 {
@@ -229,17 +235,20 @@ syscall(void)
   num = curproc->tf->eax;
 
   if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
-
+    // Incrementar el contador de invocaciones
     syscall_counts[num]++;
+
+    // Ejecutar la syscall
     curproc->tf->eax = syscalls[num]();
 
-    
+    // Si el tracing está activado, imprimir la información
     if (trace_on == 1) {
         
         cprintf("%s(", syscallnames[num]); // Imprime "nombre("
         
         int count = syscall_argc[num];
         int i;
+        // Recorro y saco los argumentos uno por uno
         for(i = 0; i < count; i++){
             int arg = get_syscall_arg(curproc, i);
             cprintf("%d", arg); 

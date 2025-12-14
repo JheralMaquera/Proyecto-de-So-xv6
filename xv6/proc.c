@@ -538,19 +538,19 @@ void
 psmem(void)
 {
   struct proc *p;
-  // TRUCO: Agregamos espacios al final para que todas midan 8 letras exactas
+  // Estados con espacios para alineacion visual
   static char *states[] = {
   [UNUSED]    "UNUSED  ", 
   [EMBRYO]    "EMBRYO  ",
   [SLEEPING]  "SLEEPING",
   [RUNNABLE]  "RUNNABLE",
-  [RUNNING]   "RUNNING ", // <-- Ojo al espacio extra aquí
+  [RUNNING]   "RUNNING ", 
   [ZOMBIE]    "ZOMBIE  "
   };
 
-  acquire(&ptable.lock);
+  acquire(&ptable.lock); // Candado para leer seguro
 
-  // Usamos menos tabs y más espacios visuales
+ 
   cprintf("\nPID    Estado      Memoria     Nombre\n");
   cprintf("--------------------------------------\n");
   
@@ -558,8 +558,7 @@ psmem(void)
     if(p->state == UNUSED)
       continue;
 
-    // Quitamos un \t después de %s porque ya rellenamos con espacios arriba
-    // %s ahora siempre mide 8, mas un espacio manual, queda perfecto.
+    // Si el estado es valido, imprimimos con formato alineado
     if(p->state >= 0 && p->state < NELEM(states) && states[p->state])
       cprintf("%d      %s    %d       %s\n", p->pid, states[p->state], p->sz, p->name);
     else

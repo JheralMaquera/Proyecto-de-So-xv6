@@ -24,7 +24,7 @@ int
 main(int argc, char *argv[])
 {
   int i;
-
+  // Si se pasa un argumento, mostramos el conteo de esa syscall
   if(argc == 2){
     int id = atoi(argv[1]);
     int conteo = get_count(id);
@@ -36,7 +36,7 @@ main(int argc, char *argv[])
              id, nombres_syscalls[id], conteo);
     }
   } else {
-
+    //Tabla general
     printf(1, "ID   Nombre        Invocaciones\n");
     printf(1, "--------------------------------\n");
 

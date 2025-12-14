@@ -7,7 +7,7 @@
 #include "mmu.h"
 #include "proc.h"
 
-
+//Variable global que defini en syscall.c
 extern int trace_on;
 extern void psmem(void);
 
@@ -94,20 +94,21 @@ sys_uptime(void)
   return xticks;
 }
 
-
+//Syscall para activar/desactivar el trace
 int
 sys_trace(void)
 {
   int state;
 
-  // argint(0, &state) recupera el primer argumento (índice 0) que envió el usuario
+  
   if(argint(0, &state) < 0)
     return -1;
 
-  trace_on = state; // Asignamos el valor (0 o 1)
+  trace_on = state; 
   return 0;
 }
 
+// Wrapper para llamar a psmem en proc.c
 int
 sys_psmem(void)
 {
