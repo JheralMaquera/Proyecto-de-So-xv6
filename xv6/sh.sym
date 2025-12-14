@@ -49,6 +49,7 @@
 000019a0 __bss_start
 00000c90 memset
 00000000 main
+00000ec3 get_count
 00000c00 strcmp
 00000e8b dup
 000003c0 pipecmd

@@ -33,6 +33,7 @@
 00000da8 __bss_start
 000003f0 memset
 00000000 main
+00000623 get_count
 00000360 strcmp
 000005eb dup
 000004b0 stat

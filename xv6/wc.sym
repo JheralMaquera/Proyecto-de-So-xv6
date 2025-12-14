@@ -32,6 +32,7 @@
 00000ba0 __bss_start
 00000240 memset
 00000000 main
+00000473 get_count
 000001b0 strcmp
 0000043b dup
 00000ba0 buf

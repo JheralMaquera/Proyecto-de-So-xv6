@@ -726,10 +726,12 @@ SYSCALL(psmem)
  46b:	b8 17 00 00 00       	mov    $0x17,%eax
  470:	cd 40                	int    $0x40
  472:	c3                   	ret
- 473:	66 90                	xchg   %ax,%ax
- 475:	66 90                	xchg   %ax,%ax
- 477:	66 90                	xchg   %ax,%ax
- 479:	66 90                	xchg   %ax,%ax
+
+00000473 <get_count>:
+SYSCALL(get_count)
+ 473:	b8 18 00 00 00       	mov    $0x18,%eax
+ 478:	cd 40                	int    $0x40
+ 47a:	c3                   	ret
  47b:	66 90                	xchg   %ax,%ax
  47d:	66 90                	xchg   %ax,%ax
  47f:	90                   	nop

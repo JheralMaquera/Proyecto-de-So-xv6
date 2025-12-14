@@ -589,10 +589,12 @@ SYSCALL(psmem)
  34b:	b8 17 00 00 00       	mov    $0x17,%eax
  350:	cd 40                	int    $0x40
  352:	c3                   	ret
- 353:	66 90                	xchg   %ax,%ax
- 355:	66 90                	xchg   %ax,%ax
- 357:	66 90                	xchg   %ax,%ax
- 359:	66 90                	xchg   %ax,%ax
+
+00000353 <get_count>:
+SYSCALL(get_count)
+ 353:	b8 18 00 00 00       	mov    $0x18,%eax
+ 358:	cd 40                	int    $0x40
+ 35a:	c3                   	ret
  35b:	66 90                	xchg   %ax,%ax
  35d:	66 90                	xchg   %ax,%ax
  35f:	90                   	nop

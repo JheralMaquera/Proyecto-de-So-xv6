@@ -58,6 +58,7 @@
 00003750 memset
 00000840 createtest
 00000000 main
+00003983 get_count
 00001230 createdelete
 000036c0 strcmp
 00000490 writetest

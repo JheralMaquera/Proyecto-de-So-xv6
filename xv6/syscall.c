@@ -20,6 +20,7 @@ int trace_on = 0;
 
 extern int sys_trace(void);
 extern int sys_psmem(void);
+static int syscall_counts[30] = {0};
 
 int
 fetchint(uint addr, int *ip)
@@ -111,6 +112,21 @@ extern int sys_wait(void);
 extern int sys_write(void);
 extern int sys_uptime(void);
 
+int
+sys_get_count(void)
+{
+  int id;
+  // Leemos el argumento (qué ID de syscall quiere saber el usuario)
+  if(argint(0, &id) < 0)
+    return -1;
+  
+  // Si el ID es válido, devolvemos la cuenta
+  if(id > 0 && id < 30) {
+    return syscall_counts[id];
+  }
+  return -1;
+}
+
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
 [SYS_exit]    sys_exit,
@@ -135,6 +151,7 @@ static int (*syscalls[])(void) = {
 [SYS_close]   sys_close,
 [SYS_trace]   sys_trace,
 [SYS_psmem]   sys_psmem,
+[SYS_get_count]   sys_get_count,
 };
 
 static char *syscallnames[] = {
@@ -161,6 +178,7 @@ static char *syscallnames[] = {
 [SYS_close]   "close (Cerrar)",
 [SYS_trace]   "trace (Rastrear)",
 [SYS_psmem]   "psmem (Info Memoria)",
+[SYS_get_count]   "get_count",
 };
 
 static int syscall_argc[] = {
@@ -187,6 +205,7 @@ static int syscall_argc[] = {
 [SYS_close]   1,
 [SYS_trace]   1,
 [SYS_psmem]   0,
+[SYS_get_count]   1,
 };
 
 
@@ -210,10 +229,13 @@ syscall(void)
   num = curproc->tf->eax;
 
   if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
+
+    syscall_counts[num]++;
     curproc->tf->eax = syscalls[num]();
 
     
     if (trace_on == 1) {
+        
         cprintf("%s(", syscallnames[num]); // Imprime "nombre("
         
         int count = syscall_argc[num];

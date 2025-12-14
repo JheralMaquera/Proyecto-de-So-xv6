@@ -33,6 +33,7 @@
 00000e80 __bss_start
 00000460 memset
 00000000 main
+00000693 get_count
 00000340 matchstar
 000003d0 strcmp
 0000065b dup

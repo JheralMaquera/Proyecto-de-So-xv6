@@ -25,6 +25,7 @@ int sleep(int);
 int uptime(void);
 int trace(int);
 int psmem(void);
+int get_count(int);
 
 // ulib.c
 int stat(const char*, struct stat*);

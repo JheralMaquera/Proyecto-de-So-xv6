@@ -2138,10 +2138,12 @@ SYSCALL(psmem)
      ebb:	b8 17 00 00 00       	mov    $0x17,%eax
      ec0:	cd 40                	int    $0x40
      ec2:	c3                   	ret
-     ec3:	66 90                	xchg   %ax,%ax
-     ec5:	66 90                	xchg   %ax,%ax
-     ec7:	66 90                	xchg   %ax,%ax
-     ec9:	66 90                	xchg   %ax,%ax
+
+00000ec3 <get_count>:
+SYSCALL(get_count)
+     ec3:	b8 18 00 00 00       	mov    $0x18,%eax
+     ec8:	cd 40                	int    $0x40
+     eca:	c3                   	ret
      ecb:	66 90                	xchg   %ax,%ax
      ecd:	66 90                	xchg   %ax,%ax
      ecf:	90                   	nop
