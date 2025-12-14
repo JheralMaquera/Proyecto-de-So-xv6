@@ -183,6 +183,7 @@ UPROGS=\
 	_zombie\
 	_trace\
 	_psmem\
+	_uptime\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
