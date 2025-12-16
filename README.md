@@ -57,9 +57,9 @@ make qemu-nox
 
 #### Entregable 1 - Trace
 ```bash
-trace on      # Activa trazado
+trace 1       # Activa trazado
 ls            # Verás las syscalls ejecutadas
-trace off     # Desactiva trazado
+trace 0       # Desactiva trazado
 ```
 
 #### Entregable 2 - Comandos de Usuario
