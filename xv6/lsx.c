@@ -69,13 +69,13 @@ lsx(char *path)
   }
 
   // Header per target path (keeps output readable when multiple args)
-  printf(1, "NAME             TYPE  INO   NLINK SIZE\n");
-  printf(1, "---------------------------------------\n");
+  printf(1, "NAME             TYPE   INO  NLINK  SIZE\n");
+  printf(1, "------------------------------------------\n");
 
   switch(st.type){
   case T_FILE:
   case T_DEV:
-    printf(1, "%s %4s %5d %5d %5d\n",
+    printf(1, "%s %s   %d    %d      %d\n",
            fmtname(path), typename(st.type), st.ino, st.nlink, st.size);
     break;
 
@@ -102,7 +102,7 @@ lsx(char *path)
       }
       // Nota: para mostrar nlink/size/ino usamos `stat()` (no `fstat()`),
       // porque aquí estamos iterando entradas por nombre.
-      printf(1, "%s %4s %5d %5d %5d\n",
+      printf(1, "%s %s   %d    %d      %d\n",
              fmtname(buf), typename(st.type), st.ino, st.nlink, st.size);
     }
     break;
